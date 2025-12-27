@@ -75,14 +75,16 @@ func _show_level() -> void:
 	current_level_node = next_level
 
 func _lose_level() -> void:
+	print("Lose")
 	%Timer.stop()
 	health = health - 1
-	if health == 0:	
+	if health == 0:
 		_show_lose_screen()
 	else:
 		_next_level()
-	if current_level_node:
+	if current_level_node: 
 		current_level_node.queue_free()
+		current_level_node = null
 
 #endregion
 
@@ -91,11 +93,13 @@ func _lose_level() -> void:
 
 func _show_lose_screen() -> void:
 	InputManager.set_is_in_game(false)
-	if current_level_node:
-		current_level_node.queue_free()
 	var win_screen: Control = load("res://ui/screens/win-screen/win_screen.tscn").instantiate()
 	win_screen.tree_exited.connect(_show_title_screen)
 	add_child(win_screen)
+	for child in get_children():
+		if child is Level:
+			child.queue_free()
+			current_level_node = null
 	
 func _show_credits() -> void:
 	var credits: Node = load("res://ui/screens/credit-screen/credit_screen.tscn").instantiate()
@@ -103,6 +107,7 @@ func _show_credits() -> void:
 	menu_layer.add_child(credits)
 	
 func _show_title_screen() -> void:
+	health = 3
 	$MenuLayer/GameUI.visible = false
 	InputManager.set_is_in_game(false)
 	var title_screen: Node = load("res://ui/screens/title-screen/title_screen.tscn").instantiate()
